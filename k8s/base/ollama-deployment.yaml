@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ollama-deployment
+  namespace: llama
+  labels:
+    app: ollama
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: ollama
+  template:
+    metadata:
+      labels:
+        app: ollama
+    spec:
+      containers:
+        - name: ollama
+          image: ollama/ollama:latest
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: entrypoint-script
+              mountPath: /entrypoint.sh
+              subPath: entrypoint.sh
+          command: ["/usr/bin/bash", "/entrypoint.sh"]
+          resources:
+            limits:
+              nvidia.com/gpu: 1  # Requesting 3 NVIDIA GPUs for the container
+      volumes:
+        - name: entrypoint-script
+          configMap:
+            name: ollama-entrypoint  # Reference to the ConfigMap created earlier
+            defaultMode: 0755
+      nodeSelector:
+      restartPolicy: Always
