@@ -11,16 +11,16 @@ helm install --wait --generate-name -n gpu-operator --create-namespace nvidia/gp
 
 #Because best practices. ;)
 #TO DO: Fix the params, make it useful.
-kubectl apply -f entrypoint-configmap.yaml
+kubectl apply -f k8s/base/entrypoint-configmap.yaml
 
 #Deploy Ollama pods
-kubectl apply -f ollama-deployment.yaml
+kubectl apply -f k8s/base/ollama-deployment.yaml
 
 #Expose the aollama service
-kubectl apply -f ollama-service.yaml
+kubectl apply -f k8s/base/ollama-service.yaml
 
 #Deploy OpenWebUI
-kubectl apply -f openwebui-deployment.yaml
+kubectl apply -f k8s/base/openwebui-deployment.yaml
 
 #Expose the OpenWebUI service
-kubectl logs <ollama-pod-name> -n llama405b
+kubectl apply -f openwebui-service.yaml
