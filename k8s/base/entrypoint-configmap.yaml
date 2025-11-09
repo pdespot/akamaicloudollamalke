@@ -1,38 +1,24 @@
-apiVersion: apps/v1
-kind: Deployment
+# entrypoint-configmap.yaml
+apiVersion: v1
+kind: ConfigMap
 metadata:
-  name: ollama-deployment
-  namespace: llama
-  labels:
-    app: ollama
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: ollama
-  template:
-    metadata:
-      labels:
-        app: ollama
-    spec:
-      containers:
-        - name: ollama
-          image: ollama/ollama:latest
-          ports:
-            - containerPort: 80
-          volumeMounts:
-            - name: entrypoint-script
-              mountPath: /entrypoint.sh
-              subPath: entrypoint.sh
-          command: ["/usr/bin/bash", "/entrypoint.sh"]
-          resources:
-            limits:
-              nvidia.com/gpu: 3  # Requesting 3 NVIDIA GPUs for the container
-      volumes:
-        - name: entrypoint-script
-          configMap:
-            name: ollama-entrypoint  # Reference to the ConfigMap created earlier
-            defaultMode: 0755
-      nodeSelector:
-        gpu.nvidia.com/class: "4000-ada" 
-      restartPolicy: Always
+  name: ollama-entrypoint
+  namespace: llama  # Specify the namespace
+data:
+  entrypoint.sh: |
+    #!/bin/bash
+
+    # Start Ollama in the background.
+    /bin/ollama serve &
+
+    # Record Process ID.
+    pid=$!
+
+    # Wait for Ollama to start.
+    sleep 30
+
+    # Pull the specific LLaMA 405B model
+    ollama pull llama3.1:405b
+
+    # Wait for the Ollama process to finish.
+    wait $pid
