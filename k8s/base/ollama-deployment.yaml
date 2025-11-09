@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: ollama-deployment
-  namespace: llama405b  
+  namespace: llama  
   labels:
     app: ollama
 spec:
