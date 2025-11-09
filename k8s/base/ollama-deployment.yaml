@@ -2,11 +2,11 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: ollama-deployment
-  namespace: llama
+  namespace: llama405b  
   labels:
     app: ollama
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: ollama
@@ -27,11 +27,13 @@ spec:
           command: ["/usr/bin/bash", "/entrypoint.sh"]
           resources:
             limits:
-              nvidia.com/gpu: 1  # Requesting 3 NVIDIA GPUs for the container
+              nvidia.com/gpu: 3  # Requesting 3 NVIDIA GPUs for the container
       volumes:
         - name: entrypoint-script
           configMap:
             name: ollama-entrypoint  # Reference to the ConfigMap created earlier
             defaultMode: 0755
-      nodeSelector:
+#Removed as a test
+#      nodeSelector:
+#        gpu.nvidia.com/class: "4000 ada" 
       restartPolicy: Always
